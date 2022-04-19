@@ -8,15 +8,18 @@ import { StartPollingOptions, TelegramOptions } from 'puregram/lib/interfaces';
 
 export interface TelegramModuleOptions {
   token: string;
-  telegramName?: string;
+  name?: string;
   options?: Partial<Omit<TelegramOptions, 'token'>>;
   pollingOptions?: StartPollingOptions | false;
+
   include?: Function[];
   middlewaresBefore?: ReadonlyArray<Middleware<any>>;
   middlewaresAfter?: ReadonlyArray<Middleware<any>>;
+
   useSessionManager?: boolean | SessionManager;
   useSceneManager?: boolean | SceneManager;
   useHearManager?: boolean | HearManager<MessageContext>;
+
   notReplyMessage?: boolean;
 }
 
@@ -28,7 +31,7 @@ export interface TelegramOptionsFactory {
 
 export interface TelegramModuleAsyncOptions
   extends Pick<ModuleMetadata, 'imports'> {
-  telegramName?: string;
+  name?: string;
   useExisting?: Type<TelegramOptionsFactory>;
   useClass?: Type<TelegramOptionsFactory>;
   useFactory?: (

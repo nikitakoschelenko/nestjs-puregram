@@ -37,7 +37,7 @@ export class TelegramCoreModule implements OnApplicationShutdown {
   ) {}
 
   public static forRoot(options: TelegramModuleOptions): DynamicModule {
-    const telegramApiName: string = getTelegramToken(options.telegramName);
+    const telegramApiName: string = getTelegramToken(options.name);
 
     const telegramApiNameProvider: Provider = {
       provide: TELEGRAM_NAME,
@@ -73,7 +73,7 @@ export class TelegramCoreModule implements OnApplicationShutdown {
   public static forRootAsync(
     options: TelegramModuleAsyncOptions
   ): DynamicModule {
-    const telegramApiName: string = getTelegramToken(options.telegramName);
+    const telegramApiName: string = getTelegramToken(options.name);
 
     const telegramApiNameProvider: Provider = {
       provide: TELEGRAM_NAME,
