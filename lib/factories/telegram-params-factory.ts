@@ -1,5 +1,6 @@
 import { ParamData } from '@nestjs/common';
 import { ParamsFactory } from '@nestjs/core/helpers/external-context-creator';
+import { NextMiddleware } from 'middleware-io';
 import { Context } from 'puregram';
 
 import { TelegramParamtype } from '../enums/telegram-paramtype.enum';
@@ -10,7 +11,7 @@ export class TelegramParamsFactory implements ParamsFactory {
     data: ParamData,
     args: unknown[]
   ): unknown {
-    const [ctx, next] = args as [Context, Function];
+    const [ctx, next] = args as [Context, NextMiddleware];
 
     switch (type) {
       case TelegramParamtype.NEXT:

@@ -37,19 +37,19 @@ export class TelegramCoreModule implements OnApplicationShutdown {
   ) {}
 
   public static forRoot(options: TelegramModuleOptions): DynamicModule {
-    const telegramApiName = getTelegramToken(options.telegramName);
+    const telegramApiName: string = getTelegramToken(options.telegramName);
 
-    const telegramApiNameProvider = {
+    const telegramApiNameProvider: Provider = {
       provide: TELEGRAM_NAME,
       useValue: telegramApiName
     };
 
     const telegramApiProvider: Provider = {
       provide: telegramApiName,
-      useFactory: async () => await createTelegramApiFactory(options)
+      useFactory: () => createTelegramApiFactory(options)
     };
 
-    const providers = [
+    const providers: Provider[] = [
       sessionManagerProvider,
       sceneManagerProvider,
       hearManagerProvider,
@@ -73,23 +73,23 @@ export class TelegramCoreModule implements OnApplicationShutdown {
   public static forRootAsync(
     options: TelegramModuleAsyncOptions
   ): DynamicModule {
-    const telegramApiName = getTelegramToken(options.telegramName);
+    const telegramApiName: string = getTelegramToken(options.telegramName);
 
-    const telegramApiNameProvider = {
+    const telegramApiNameProvider: Provider = {
       provide: TELEGRAM_NAME,
       useValue: telegramApiName
     };
 
     const telegramApiProvider: Provider = {
       provide: telegramApiName,
-      useFactory: async (options: TelegramModuleOptions) =>
-        await createTelegramApiFactory(options),
+      useFactory: (options: TelegramModuleOptions) =>
+        createTelegramApiFactory(options),
       inject: [TELEGRAM_MODULE_OPTIONS]
     };
 
-    const asyncProviders = this.createAsyncProviders(options);
+    const asyncProviders: Provider[] = this.createAsyncProviders(options);
 
-    const providers = [
+    const providers: Provider[] = [
       sessionManagerProvider,
       sceneManagerProvider,
       hearManagerProvider,
@@ -116,7 +116,8 @@ export class TelegramCoreModule implements OnApplicationShutdown {
     if (options.useExisting || options.useFactory) {
       return [this.createAsyncOptionsProvider(options)];
     }
-    const useClass = options.useClass as Type<TelegramOptionsFactory>;
+
+    const useClass: Type<TelegramOptionsFactory> = options.useClass!;
     return [
       this.createAsyncOptionsProvider(options),
       {
@@ -137,14 +138,14 @@ export class TelegramCoreModule implements OnApplicationShutdown {
       };
     }
 
-    // `as Type<TelegramOptionsFactory>` is a workaround for microsoft/TypeScript#31603
-    const inject = [
-      (options.useClass || options.useExisting) as Type<TelegramOptionsFactory>
+    const inject: Type<TelegramOptionsFactory>[] = [
+      (options.useClass || options.useExisting)!
     ];
+
     return {
       provide: TELEGRAM_MODULE_OPTIONS,
-      useFactory: async (optionsFactory: TelegramOptionsFactory) =>
-        await optionsFactory.createTelegramOptions(),
+      useFactory: (optionsFactory: TelegramOptionsFactory) =>
+        optionsFactory.createTelegramOptions(),
       inject
     };
   }

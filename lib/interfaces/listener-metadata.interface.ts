@@ -1,8 +1,6 @@
-import { HandlerType } from '../types';
+import { ListenerHandlerType } from '../enums/listener-handler-type.enum';
 
 export interface ListenerMetadata {
-  handlerType: HandlerType;
-  method?: string;
-  event: any;
+  type: ListenerHandlerType;
   args: unknown[];
 }

@@ -1,24 +1,18 @@
-import { PipeTransform, Type } from '@nestjs/common';
+import { ExecutionContext, createParamDecorator } from '@nestjs/common';
+import { Context as TelegramContext } from 'puregram';
 
-import { TelegramParamtype } from '../../enums/telegram-paramtype.enum';
-import { createTelegramPipesParamDecorator } from '../../utils/param-decorator.util';
+import { TelegramExecutionContext } from '../../execution-context';
 
-export function Context(): ParameterDecorator;
-export function Context(
-  ...pipes: (Type<PipeTransform> | PipeTransform)[]
-): ParameterDecorator;
-export function Context(
-  property: string,
-  ...pipes: (Type<PipeTransform> | PipeTransform)[]
-): ParameterDecorator;
-export function Context(
-  property?: string | (Type<PipeTransform> | PipeTransform),
-  ...pipes: (Type<PipeTransform> | PipeTransform)[]
-) {
-  return createTelegramPipesParamDecorator(TelegramParamtype.CONTEXT)(
-    property,
-    ...pipes
-  );
-}
+export const Context = createParamDecorator(
+  (data: keyof TelegramContext | never, context: ExecutionContext) => {
+    const executionContext: TelegramExecutionContext =
+      TelegramExecutionContext.create(context);
 
+    const telegramContext: TelegramContext = executionContext.getContext();
+
+    return data ? telegramContext[data] : telegramContext;
+  }
+);
+
+// alias
 export const Ctx = Context;

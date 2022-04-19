@@ -1,9 +1,10 @@
 import { HearConditions } from '@puregram/hear';
 
+import { ListenerHandlerType } from '../../enums/listener-handler-type.enum';
 import { createListenerDecorator } from '../../utils';
 
-export const Hears = createListenerDecorator<HearConditions<any>>('hears');
-export const HearFallback = createListenerDecorator<never, never>(
-  'hears',
-  'onFallback'
-);
+export const Hears = (hearConditions: HearConditions<any>) =>
+  createListenerDecorator(ListenerHandlerType.HEARS, hearConditions);
+
+export const HearFallback = () =>
+  createListenerDecorator(ListenerHandlerType.HEAR_FALLBACK);

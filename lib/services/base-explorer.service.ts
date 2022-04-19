@@ -10,7 +10,12 @@ export class BaseExplorerService {
     if (!include || isEmpty(include)) {
       return [...modulesContainer.values()];
     }
-    const whitelisted = this.includeWhitelisted(modulesContainer, include);
+
+    const whitelisted: Module[] = this.includeWhitelisted(
+      modulesContainer,
+      include
+    );
+
     return whitelisted;
   }
 
@@ -18,7 +23,8 @@ export class BaseExplorerService {
     modulesContainer: Map<string, Module>,
     include: Function[]
   ): Module[] {
-    const modules = [...modulesContainer.values()];
+    const modules: Module[] = [...modulesContainer.values()];
+
     return modules.filter(({ metatype }) => include.includes(metatype));
   }
 
@@ -26,12 +32,13 @@ export class BaseExplorerService {
     modules: Module[],
     callback: (instance: InstanceWrapper, moduleRef: Module) => T | T[]
   ): T[] {
-    const invokeMap = () => {
-      return modules.map((moduleRef) => {
-        const providers = [...moduleRef.providers.values()];
-        return providers.map((wrapper) => callback(wrapper, moduleRef));
-      });
-    };
+    const invokeMap = () =>
+      modules.map((moduleRef) =>
+        [...moduleRef.providers.values()].map((wrapper) =>
+          callback(wrapper, moduleRef)
+        )
+      );
+
     return flattenDeep(invokeMap()).filter(identity);
   }
 }

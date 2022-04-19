@@ -5,17 +5,23 @@ import { ParamMetadata } from '@nestjs/core/helpers/interfaces';
 import { InstanceWrapper } from '@nestjs/core/injector/instance-wrapper';
 import { Module } from '@nestjs/core/injector/module';
 import { MetadataScanner } from '@nestjs/core/metadata-scanner';
-import { HearManager } from '@puregram/hear';
+import { HearConditions, HearManager } from '@puregram/hear';
 import { SceneManager, StepScene } from '@puregram/scenes';
 import { SessionManager } from '@puregram/session';
-import { NextMiddleware } from 'middleware-io';
-import { Composer, Context, MessageContext, Telegram } from 'puregram';
-import { AllowArray } from 'puregram/lib/types';
-import { Updates } from 'puregram/lib/updates';
+import { Middleware, NextMiddleware } from 'middleware-io';
+import {
+  Composer,
+  Context,
+  MessageContext,
+  Telegram,
+  UpdateType
+} from 'puregram';
+import { UpdateName } from 'puregram/lib/types';
 
+import { ListenerHandlerType } from '../enums/listener-handler-type.enum';
 import { TelegramContextType } from '../execution-context';
 import { TelegramParamsFactory } from '../factories/telegram-params-factory';
-import { TelegramModuleOptions } from '../interfaces';
+import { ListenerMetadata, TelegramModuleOptions } from '../interfaces';
 import {
   PARAM_ARGS_METADATA,
   TELEGRAM_HEAR_MANAGER,
@@ -33,16 +39,16 @@ export class ListenersExplorerService
   extends BaseExplorerService
   implements OnModuleInit
 {
-  private readonly telegramParamsFactory = new TelegramParamsFactory();
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  private telegram: Telegram;
+  private readonly telegramParamsFactory: TelegramParamsFactory =
+    new TelegramParamsFactory();
+
+  private telegram!: Telegram;
 
   constructor(
     @Inject(TELEGRAM_HEAR_MANAGER)
-    private readonly hearManagerProvider: HearManager<MessageContext>,
+    private readonly hearManager: HearManager<MessageContext>,
     @Inject(TELEGRAM_SESSION_MANAGER)
-    private readonly sessionManagerProvider: SessionManager,
+    private readonly sessionManager: SessionManager,
     @Inject(TELEGRAM_SCENE_MANAGER)
     private readonly sceneManager: SceneManager,
     @Inject(TELEGRAM_MODULE_OPTIONS)
@@ -64,56 +70,55 @@ export class ListenersExplorerService
       strict: false
     });
 
-    if (this.telegramOptions.middlewaresBefore) {
-      const composer = Composer.builder();
-      for (const middleware of this.telegramOptions.middlewaresBefore) {
-        composer.use(middleware);
-      }
-      this.telegram.updates.use(composer.compose());
-    }
+    const composer: Composer<Context> = Composer.builder();
+
+    // add `before` middlewares
+    this.telegramOptions.middlewaresBefore?.forEach(
+      composer.use.bind(composer)
+    );
 
     if (this.telegramOptions.useSessionManager !== false) {
-      this.telegram.updates.use(this.sessionManagerProvider.middleware);
+      composer.use(this.sessionManager.middleware);
     }
 
     if (this.telegramOptions.useSceneManager !== false) {
-      this.telegram.updates.use(this.sceneManager.middleware);
-      this.telegram.updates.use(this.sceneManager.middlewareIntercept);
+      composer.use(this.sceneManager.middleware);
+      composer.use(this.sceneManager.middlewareIntercept);
     }
 
-    this.explore();
+    this.explore(composer);
 
     if (this.telegramOptions.useHearManager !== false) {
-      this.telegram.updates.use(this.hearManagerProvider.middleware);
+      composer.use(this.hearManager.middleware);
     }
 
-    if (this.telegramOptions.middlewaresAfter) {
-      const composer = Composer.builder();
-      for (const middleware of this.telegramOptions.middlewaresAfter) {
-        composer.use(middleware);
-      }
-      this.telegram.updates.use(composer.compose());
-    }
+    // add `after` middlewares
+    this.telegramOptions.middlewaresAfter?.forEach(composer.use.bind(composer));
+
+    // finally
+    this.telegram.updates.use(composer.compose());
   }
 
-  explore(): void {
-    const modules = this.getModules(
+  explore(composer: Composer<Context>): void {
+    const modules: Module[] = this.getModules(
       this.modulesContainer,
-      this.telegramOptions.include || []
+      this.telegramOptions.include ?? []
     );
 
-    this.registerUpdates(modules);
+    this.registerUpdates(composer, modules);
     this.registerScenes(modules);
   }
 
-  private registerUpdates(modules: Module[]): void {
-    const updates = this.flatMap<InstanceWrapper>(
+  private registerUpdates(
+    composer: Composer<Context>,
+    modules: Module[]
+  ): void {
+    const updates: InstanceWrapper[] = this.flatMap(
       modules,
       (instance) => this.filterUpdates(instance)!
     );
-    updates.forEach((wrapper) =>
-      this.registerListeners(this.telegram.updates, wrapper)
-    );
+
+    updates.forEach((wrapper) => this.registerListeners(composer, wrapper));
   }
 
   private filterUpdates(
@@ -122,25 +127,19 @@ export class ListenersExplorerService
     const { instance } = wrapper;
     if (!instance) return;
 
-    const isUpdate = this.metadataAccessor.isUpdate(wrapper.metatype);
+    const isUpdate: boolean = this.metadataAccessor.isUpdate(wrapper.metatype);
     if (!isUpdate) return;
 
     return wrapper;
   }
 
   private registerScenes(modules: Module[]): void {
-    const scenes = this.flatMap<InstanceWrapper>(
+    const scenes: InstanceWrapper[] = this.flatMap(
       modules,
       (wrapper) => this.filterScenes(wrapper)!
     );
-    scenes.forEach((wrapper) => {
-      const sceneId = this.metadataAccessor.getSceneMetadata(
-        wrapper.instance.constructor
-      );
-      if (!sceneId) return;
 
-      this.registerSceneSteps(sceneId, wrapper);
-    });
+    scenes.forEach((wrapper) => this.registerScene(wrapper));
   }
 
   private filterScenes(
@@ -149,161 +148,183 @@ export class ListenersExplorerService
     const { instance } = wrapper;
     if (!instance) return;
 
-    const isScene = this.metadataAccessor.isScene(wrapper.metatype);
+    const isScene: boolean = this.metadataAccessor.isScene(wrapper.metatype);
     if (!isScene) return;
 
     return wrapper;
   }
 
   private registerListeners(
-    updates: Updates,
-    wrapper: InstanceWrapper<unknown>
+    composer: Composer<Context>,
+    wrapper: InstanceWrapper<Object>
   ): void {
     const { instance } = wrapper;
-    const prototype = Object.getPrototypeOf(instance);
+    const prototype: Object = Object.getPrototypeOf(instance);
+
     this.metadataScanner.scanFromPrototype(instance, prototype, (name) =>
-      this.registerIfListener(updates, instance, prototype, name)
+      this.registerIfListener(composer, instance, prototype, name)
     );
   }
 
-  private registerSceneSteps(
-    sceneId: string,
-    wrapper: InstanceWrapper<any>
-  ): void {
+  private registerScene(wrapper: InstanceWrapper): void {
     const { instance } = wrapper;
-    const prototype = Object.getPrototypeOf(instance);
+    const prototype: Object = Object.getPrototypeOf(instance);
 
-    const steps: { step: number; methodName: string }[] = [];
-
-    let enterHandler;
-    let leaveHandler;
-
-    let index = 0;
-    this.metadataScanner.scanFromPrototype(
-      instance,
-      prototype,
-      (methodName) => {
-        const methodRef = prototype[methodName];
-        const action = this.metadataAccessor.getSceneActionMetadata(methodRef);
-        if (action) {
-          if (action === 'enter') {
-            enterHandler = this.createContextCallback(
-              instance,
-              prototype,
-              methodName
-            );
-          } else {
-            leaveHandler = this.createContextCallback(
-              instance,
-              prototype,
-              methodName
-            );
-          }
-          return;
-        }
-        const step = this.metadataAccessor.getSceneStepMetadata(methodRef);
-        steps.push({ step: step ?? index++, methodName });
-      }
+    const slug: string | undefined = this.metadataAccessor.getSceneMetadata(
+      wrapper.instance.constructor
     );
+    if (!slug) return;
 
-    const scene = new StepScene(sceneId, {
+    const steps: [number, string][] = [];
+
+    let currentStep: number = 0;
+    let enterHandler: StepScene['enterHandler'] | undefined;
+    let leaveHandler: StepScene['leaveHandler'] | undefined;
+
+    this.metadataScanner.scanFromPrototype(instance, prototype, (method) => {
+      const target: Function = prototype[method as keyof typeof prototype];
+
+      const action: 'enter' | 'leave' | undefined =
+        this.metadataAccessor.getSceneActionMetadata(target);
+
+      switch (action) {
+        case 'enter':
+          enterHandler = this.createContextCallback(
+            instance,
+            prototype,
+            method
+          );
+          break;
+
+        case 'leave':
+          leaveHandler = this.createContextCallback(
+            instance,
+            prototype,
+            method
+          );
+          break;
+      }
+
+      const step: number =
+        this.metadataAccessor.getSceneStepMetadata(target) ?? currentStep++;
+
+      steps.push([step, method]);
+    });
+
+    const scene: StepScene<MessageContext> = new StepScene(slug, {
       enterHandler,
       leaveHandler,
       steps: steps
-        .sort((a, b) => a.step - b.step)
-        .map((e) => {
-          const listenerCallbackFn = this.createContextCallback(
-            instance,
-            prototype,
-            e.methodName
-          );
-          return listenerCallbackFn;
-        })
+        .sort(([a], [b]) => a - b)
+        .map(([, method]) =>
+          this.createContextCallback(instance, prototype, method)
+        )
     });
+
     this.sceneManager.addScenes([scene]);
   }
 
   private registerIfListener(
-    updates: Updates,
-    instance: any,
-    prototype: any,
-    methodName: string
+    composer: Composer<Context>,
+    instance: Object,
+    prototype: Object,
+    method: string
   ): void {
-    const methodRef = prototype[methodName];
-    const metadata = this.metadataAccessor.getListenerMetadata(methodRef);
-    if (!metadata || metadata.length < 1) {
-      return undefined;
-    }
+    const target: Function = prototype[method as keyof typeof prototype];
+
+    const metadata: ListenerMetadata[] | undefined =
+      this.metadataAccessor.getListenerMetadata(target);
+    if (!metadata || metadata.length < 1) return;
 
     const listenerCallbackFn = this.createContextCallback(
       instance,
       prototype,
-      methodName
+      method
     );
 
-    for (const { handlerType, method, event, args } of metadata) {
-      const getHandler =
-        () =>
-        async (ctx: Context, next: NextMiddleware): Promise<void> => {
-          const result = await listenerCallbackFn(ctx, next);
-          if (result) {
-            switch (true) {
-              case ctx.is(['message']): {
-                if (typeof result === 'string') {
-                  if (this.telegramOptions.notReplyMessage) {
-                    await (ctx as MessageContext).send(result);
-                  } else {
-                    await (ctx as MessageContext).reply(result);
-                  }
-                }
-                break;
-              }
+    for (const listener of metadata) {
+      const { type, args } = listener;
+
+      const handler: Middleware<Context> = async (
+        ctx: Context,
+        next: NextMiddleware
+      ): Promise<void> => {
+        const result: unknown = await listenerCallbackFn(ctx, next);
+
+        if (ctx.is(['message'])) {
+          if (typeof result === 'string') {
+            if (this.telegramOptions.notReplyMessage) {
+              await (ctx as MessageContext).send(result);
+            } else {
+              await (ctx as MessageContext).reply(result);
             }
           }
-          // TODO-Possible-Feature: Add more supported return types
-        };
+        }
 
-      switch (handlerType) {
-        case 'telegram_updates': {
-          if (method === 'use') {
-            updates.use(getHandler());
-          } else if (method) {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            updates[method](event, [...args, getHandler()] as AllowArray<any>);
-          }
+        // TODO-Possible-Feature: Add more supported return types
+      };
+
+      switch (type) {
+        case ListenerHandlerType.USE:
+          composer.use(handler);
           break;
-        }
-        case 'hears': {
-          if (method === 'onFallback') {
-            this.hearManagerProvider.onFallback(getHandler());
-          } else {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            this.hearManagerProvider.hear(event, ...[...args, getHandler()]);
-          }
+
+        case ListenerHandlerType.ON:
+          const update: UpdateType | UpdateName | undefined = args[0] as
+            | UpdateType
+            | UpdateName;
+          if (!update) break;
+
+          const middlewares: Middleware<Context>[] =
+            (args[1] as Middleware<Context>[]) ?? [];
+
+          composer.use((context: Context, next: NextMiddleware) => {
+            if (context.is([update])) {
+              const handlerComposer: Composer<Context> = new Composer();
+              [
+                ...(Array.isArray(middlewares) ? middlewares : [middlewares]),
+                handler
+              ].forEach(handlerComposer.use.bind(handlerComposer));
+
+              const finalHandler: Middleware<Context> =
+                handlerComposer.compose();
+
+              return finalHandler(context, next);
+            }
+
+            return next();
+          });
           break;
-        }
-        // TODO: remake it (support hearManager, etc)
+
+        case ListenerHandlerType.HEARS:
+          const hearConditions: HearConditions<unknown> | undefined =
+            args[0] as HearConditions<unknown>;
+          if (!hearConditions) break;
+
+          this.hearManager.hear(hearConditions, handler);
+          break;
+
+        case ListenerHandlerType.HEAR_FALLBACK:
+          this.hearManager.onFallback(handler);
+          break;
       }
     }
   }
 
-  createContextCallback<T extends Record<string, unknown>>(
-    instance: T,
-    prototype: unknown,
-    methodName: string
-  ) {
-    const paramsFactory = this.telegramParamsFactory;
+  createContextCallback(instance: Object, prototype: Object, method: string) {
+    const paramsFactory: TelegramParamsFactory = this.telegramParamsFactory;
+
+    const callback: (...args: unknown[]) => unknown = prototype[
+      method as keyof typeof prototype
+    ] as (...args: unknown[]) => unknown;
+
     const resolverCallback = this.externalContextCreator.create<
       Record<number, ParamMetadata>,
       TelegramContextType
     >(
       instance,
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      prototype[methodName],
-      methodName,
+      callback,
+      method,
       PARAM_ARGS_METADATA,
       paramsFactory,
       undefined,

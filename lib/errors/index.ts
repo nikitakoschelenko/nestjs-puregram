@@ -1,1 +1,1 @@
-export * from './Telegram.exception';
+export * from './telegram.exception';

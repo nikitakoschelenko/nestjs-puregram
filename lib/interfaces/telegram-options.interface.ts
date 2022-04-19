@@ -9,8 +9,8 @@ import { StartPollingOptions, TelegramOptions } from 'puregram/lib/interfaces';
 export interface TelegramModuleOptions {
   token: string;
   telegramName?: string;
-  options?: Partial<TelegramOptions>;
-  pollingOptions?: Omit<StartPollingOptions, 'token'> | false;
+  options?: Partial<Omit<TelegramOptions, 'token'>>;
+  pollingOptions?: StartPollingOptions | false;
   include?: Function[];
   middlewaresBefore?: ReadonlyArray<Middleware<any>>;
   middlewaresAfter?: ReadonlyArray<Middleware<any>>;

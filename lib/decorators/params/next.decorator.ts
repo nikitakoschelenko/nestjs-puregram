@@ -1,6 +1,15 @@
-import { TelegramParamtype } from '../../enums/telegram-paramtype.enum';
-import { createTelegramParamDecorator } from '../../utils/param-decorator.util';
+import { ExecutionContext, createParamDecorator } from '@nestjs/common';
+import { NextMiddleware } from 'middleware-io';
 
-export const Next: () => ParameterDecorator = createTelegramParamDecorator(
-  TelegramParamtype.NEXT
+import { TelegramExecutionContext } from '../../execution-context';
+
+export const Next = createParamDecorator(
+  (data: never, context: ExecutionContext): NextMiddleware => {
+    const executionContext: TelegramExecutionContext =
+      TelegramExecutionContext.create(context);
+
+    const next: NextMiddleware = executionContext.getNext();
+
+    return next;
+  }
 );
