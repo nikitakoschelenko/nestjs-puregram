@@ -19,6 +19,6 @@ export const Groups = createParamDecorator(
       telegramContext as MessageContext & { $match: RegExpMatchArray | null }
     ).$match;
 
-    return matches?.groups;
+    return matches?.groups ?? {};
   }
 );

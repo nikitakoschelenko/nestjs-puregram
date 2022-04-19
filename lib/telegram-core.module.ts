@@ -105,11 +105,6 @@ export class TelegramCoreModule implements OnApplicationShutdown {
     };
   }
 
-  async onApplicationShutdown(): Promise<void> {
-    const telegram = this.moduleRef.get<Telegram>(this.telegramName);
-    telegram && telegram.updates.stopPolling();
-  }
-
   private static createAsyncProviders(
     options: TelegramModuleAsyncOptions
   ): Provider[] {
@@ -148,5 +143,10 @@ export class TelegramCoreModule implements OnApplicationShutdown {
         optionsFactory.createTelegramOptions(),
       inject
     };
+  }
+
+  onApplicationShutdown(): void {
+    const telegram: Telegram = this.moduleRef.get<Telegram>(this.telegramName);
+    if (telegram) return telegram.updates.stopPolling();
   }
 }
