@@ -106,3 +106,7 @@ export class BotUpdate {
   }
 }
 ```
+
+<h3 style="text-align: right">
+  <a href="/docs/05_more.md">Next →</a>
+</h3>

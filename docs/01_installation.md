@@ -41,3 +41,7 @@ import { TelegramModule } from 'nestjs-puregram';
 })
 export class AppModule {}
 ```
+
+<h3 style="text-align: right">
+  <a href="/docs/02_updates.md">Next →</a>
+</h3>
