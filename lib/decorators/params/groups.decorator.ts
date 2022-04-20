@@ -6,9 +6,9 @@ import { TelegramExecutionContext } from '../../execution-context';
 
 export const Groups = createParamDecorator(
   (
-    data: number,
+    data: string,
     context: ExecutionContext
-  ): Record<string, string> | undefined => {
+  ): Record<string, string> | string | undefined => {
     const executionContext: TelegramExecutionContext =
       TelegramExecutionContext.create(context);
 
@@ -18,7 +18,8 @@ export const Groups = createParamDecorator(
     const matches: RegExpMatchArray | null = (
       telegramContext as MessageContext & { $match: RegExpMatchArray | null }
     ).$match;
+    const groups: Record<string, string> = matches?.groups ?? {};
 
-    return matches?.groups ?? {};
+    return data ? groups[data] : groups;
   }
 );

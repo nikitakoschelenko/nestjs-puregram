@@ -32,7 +32,7 @@ export class MetadataAccessorService {
     return this.reflector.get(TELEGRAM_SCENE_METADATA, target);
   }
 
-  getSceneStepMetadata(target: Function): number | undefined {
+  getSceneStepMetadata(target: Function): number | boolean | undefined {
     return this.reflector.get(TELEGRAM_SCENE_STEP_METADATA, target);
   }
 

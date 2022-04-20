@@ -1,4 +1,4 @@
-import { ArgumentsHost } from '@nestjs/common';
+import { ArgumentsHost, ContextType } from '@nestjs/common';
 import { ExecutionContextHost } from '@nestjs/core/helpers/execution-context-host';
 
 import { ITelegramArgumentsHost } from './telegram-arguments-host.interface';
@@ -7,10 +7,14 @@ export class TelegramArgumentsHost
   extends ExecutionContextHost
   implements ITelegramArgumentsHost
 {
-  static create(context: ArgumentsHost): ITelegramArgumentsHost {
-    const type = context.getType();
-    const telegramContext = new TelegramArgumentsHost(context.getArgs());
+  static create(host: ArgumentsHost): ITelegramArgumentsHost {
+    const type: ContextType = host.getType();
+
+    const telegramContext: TelegramArgumentsHost = new TelegramArgumentsHost(
+      host.getArgs()
+    );
     telegramContext.setType(type);
+
     return telegramContext;
   }
 

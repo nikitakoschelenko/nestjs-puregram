@@ -10,25 +10,28 @@ export class TelegramExecutionContext
   implements ITelegramArgumentsHost
 {
   static create(context: ExecutionContext): TelegramExecutionContext {
-    const type = context.getType();
-    const telegramContext = new TelegramExecutionContext(
-      context.getArgs(),
-      context.getClass(),
-      context.getHandler()
-    );
+    const type: ContextType = context.getType();
+
+    const telegramContext: TelegramExecutionContext =
+      new TelegramExecutionContext(
+        context.getArgs(),
+        context.getClass(),
+        context.getHandler()
+      );
     telegramContext.setType(type);
+
     return telegramContext;
   }
 
-  getType<TContext extends string = TelegramContextType>(): TContext {
+  getType<T extends string = TelegramContextType>(): T {
     return super.getType();
   }
 
-  getContext<T = any>(): T {
+  getContext<T = unknown>(): T {
     return this.getArgByIndex(0);
   }
 
-  getNext<T = any>(): T {
+  getNext<T = unknown>(): T {
     return this.getArgByIndex(1);
   }
 }

@@ -1,6 +1,6 @@
 import { ArgumentsHost } from '@nestjs/common';
 
 export interface ITelegramArgumentsHost extends ArgumentsHost {
-  getContext<T = any>(): T;
-  getNext<T = any>(): T;
+  getContext<T = unknown>(): T;
+  getNext<T = unknown>(): T;
 }

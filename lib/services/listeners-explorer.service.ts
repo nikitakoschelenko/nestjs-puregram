@@ -6,7 +6,7 @@ import { InstanceWrapper } from '@nestjs/core/injector/instance-wrapper';
 import { Module } from '@nestjs/core/injector/module';
 import { MetadataScanner } from '@nestjs/core/metadata-scanner';
 import { HearConditions, HearManager } from '@puregram/hear';
-import { SceneManager, StepScene } from '@puregram/scenes';
+import { SceneManager, StepScene, StepSceneHandler } from '@puregram/scenes';
 import { SessionManager } from '@puregram/session';
 import { Middleware, NextMiddleware } from 'middleware-io';
 import {
@@ -178,8 +178,8 @@ export class ListenersExplorerService
     const steps: [number, string][] = [];
 
     let currentStep: number = 0;
-    let enterHandler: StepScene['enterHandler'] | undefined;
-    let leaveHandler: StepScene['leaveHandler'] | undefined;
+    let enterHandler: StepSceneHandler | undefined;
+    let leaveHandler: StepSceneHandler | undefined;
 
     this.metadataScanner.scanFromPrototype(instance, prototype, (method) => {
       const target: Function = prototype[method as keyof typeof prototype];
@@ -194,7 +194,7 @@ export class ListenersExplorerService
             prototype,
             method
           );
-          break;
+          return;
 
         case 'leave':
           leaveHandler = this.createContextCallback(
@@ -202,13 +202,19 @@ export class ListenersExplorerService
             prototype,
             method
           );
+          return;
+
+        default:
           break;
       }
 
-      const step: number =
-        this.metadataAccessor.getSceneStepMetadata(target) ?? currentStep++;
+      let step: number | boolean | undefined =
+        this.metadataAccessor.getSceneStepMetadata(target);
 
-      steps.push([step, method]);
+      // step without index
+      if (step === true) step = currentStep++;
+
+      if (typeof step === 'number') steps.push([step, method]);
     });
 
     const scene: StepScene<MessageContext> = new StepScene(slug, {
@@ -312,8 +318,6 @@ export class ListenersExplorerService
   }
 
   createContextCallback(instance: Object, prototype: Object, method: string) {
-    const paramsFactory: TelegramParamsFactory = this.telegramParamsFactory;
-
     const callback: (...args: unknown[]) => unknown = prototype[
       method as keyof typeof prototype
     ] as (...args: unknown[]) => unknown;
@@ -326,12 +330,13 @@ export class ListenersExplorerService
       callback,
       method,
       PARAM_ARGS_METADATA,
-      paramsFactory,
+      this.telegramParamsFactory,
       undefined,
       undefined,
       undefined,
       'telegram'
     );
+
     return resolverCallback;
   }
 }
