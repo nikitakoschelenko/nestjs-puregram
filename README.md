@@ -20,146 +20,17 @@
   😎👍
 </p>
 
-# NestJS puregram
+<div align='center'>
+  <a href='https://github.com/ItzNeviKat/nestjs-puregram/tree/lord/docs'><b>Docs</b></a>
+  <span>&nbsp;•&nbsp;</span>
+  <a href='https://github.com/nitreojs/puregram#readme'><b>Original <code>puregram</code> docs</b></a>
+  <span>&nbsp;•&nbsp;</span>
+  <a href='https://github.com/ItzNeviKat/nestjs-puregram/tree/lord/sample'><b>Examples</b></a>
+</div>
+
+## NestJS puregram
 Powerful and modern Telegram Bot API SDK for NestJS 😁
 
-## Introduction
-This module allows you to use `puregram` in `NestJS`. For example:
-```typescript
-@Update()
-export class BotUpdate {
-  @On('message')
-  onMessage(
-    @Ctx() context: MessageContext,
-    @Next() next: NextMiddleware
-  ): NextMiddlewareReturn {
-    this.logger.debug(`New message received: ${context.text}`);
-
-    return next();
-  }
-
-  @Hears(/^\/ping$/i)
-  ping(): string {
-    return 'Pong!';
-  }
-}
-```
-
-[Read `puregram` docs](https://github.com/nitreojs/puregram#readme)
-
-## Installation
-```shell
-yarn add nestjs-puregram
-```
-```shell
-npm install nestjs-puregram
-```
-
-## Basic usage
-### Import and register `TelegramModule`
-```typescript
-@Module({
-  imports: [
-    // Common registration
-    TelegramModule.forRoot({
-      token: 'mytoken'
-    }),
-    // Async registration
-    TelegramModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        token: configService.get('TELEGRAM_TOKEN')
-      })
-    })
-    // ...other
-  ]
-})
-export class AppModule {}
-```
-
-### On update
-```typescript
-@On('message')
-onMessage(
-  @Ctx() context: MessageContext,
-  @Next() next: NextMiddleware
-): NextMiddlewareReturn {
-  this.logger.debug(`New message received: ${context.text}`);
-
-  return next();
-}
-```
-
-### Hear (`@puregram/hear`)
-```typescript
-@Hears(/^\/ping$/i)
-ping(@Ctx() context: MessageContext): Promise<unknown> {
-  return context.reply('Pong!');
-}
-```
-
-### Session (`@puregram/session`)
-```typescript
-@Hears(/^\/ping$/i)
-ping(@Ctx() context: MessageContext & SessionInterface): Promise<unknown> {
-  const { session } = context;
-
-  if (!session.times) session.times = 0;
-  session.times++;
-
-  return context.reply(`You pinged me ${session.times} times`);
-}
-```
-
-### Scenes (`@puregram/scenes`)
-```typescript
-@Scene(SIGNUP_SCENE)
-export class SignupScene {
-  @AddStep()
-  name(@Ctx() context: MessageContext & SessionInterface & StepContext): Promise<unknown> {
-    if (context.scene.step.firstTime || !context.hasText) {
-      return context.send("What's your name?");
-    }
-
-    context.scene.state.firstName = context.text;
-
-    return context.scene.step.next();
-  }
-
-  @AddStep()
-  age(@Ctx() context: MessageContext & SessionInterface & StepContext): Promise<unknown> {
-    if (context.scene.step.firstTime || !context.hasText) {
-      return context.send('How old are you?');
-    }
-
-    context.scene.state.age = Number.parseInt(context.text, 10);
-
-    return context.scene.step.next();
-  }
-
-  @AddStep()
-  async echo(@Ctx() context: MessageContext & SessionInterface & StepContext): Promise<unknown> {
-    const { firstName, age } = context.scene.state;
-
-    await context.send(`You are ${firstName} ${age} years old!`);
-
-    // Automatic exit, since this is the last scene
-    return context.scene.step.next();
-  }
-}
-```
-## Inject `Telegram` instance:
-```typescript
-export class BotUpdate {
-  constructor(@InjectTelegram() private telegram: Telegram) {}
-
-  onModuleInit(): void {
-    this.logger.log(`@${this.telegram.bot.username} started polling updates`);
-  }
-}
-```
-
-# Thanks to
+## Thanks to
 - [nitreojs](https://github.com/nitreojs) ([nitreojs/puregram](https://github.com/nitreojs/puregram)) – original package for Node.js
 - [xTCry](https://github.com/xTCry) ([xTCry/nestjs-vk](https://github.com/xTCry/nestjs-vk)) – for inspiration, some code and implementation ideas
