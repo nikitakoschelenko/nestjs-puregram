@@ -31,6 +31,8 @@
 ## NestJS puregram
 Powerful and modern Telegram Bot API SDK for NestJS 😁
 
+[Getting started](/docs/01_installation.md)
+
 ## Thanks to
 - [nitreojs](https://github.com/nitreojs) ([nitreojs/puregram](https://github.com/nitreojs/puregram)) – original package for Node.js
 - [xTCry](https://github.com/xTCry) ([xTCry/nestjs-vk](https://github.com/xTCry/nestjs-vk)) – for inspiration, some code and implementation ideas
