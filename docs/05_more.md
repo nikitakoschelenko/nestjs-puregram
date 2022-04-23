@@ -85,3 +85,32 @@ export class BotUpdate {
 }
 ```
 and pipes will work correctly!
+
+# Reply options
+You can pass reply options for method returns to `TelegramModule` options:
+```typescript
+@Module({
+  imports: [
+    TelegramModule.forRoot({
+      token: 'mytoken',
+      // use `false` to disable
+      replyOptions: {
+        send: true,
+        parse_mode: 'markdown'
+      }
+    })
+  ]
+})
+export class AppModule {}
+```
+or decorate class or method with `@ReplyOptions(replyOptions)` decorator:
+```typescript
+@Update()
+export class BotUpdate {
+  @Hears(/^\/ping$/i)
+  @ReplyOptions({ parse_mode: 'markdown' })
+  ping(): string {
+    return '***Pong!***';
+  }
+}
+```

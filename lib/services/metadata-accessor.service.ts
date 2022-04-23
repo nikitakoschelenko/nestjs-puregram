@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
-import { ListenerMetadata } from '../interfaces';
+import { ContextReplyOptions, ListenerMetadata } from '../interfaces';
 import {
   TELEGRAM_LISTENERS_METADATA,
+  TELEGRAM_REPLY_OPTIONS_METADATA,
   TELEGRAM_SCENE_ACTION_METADATA,
   TELEGRAM_SCENE_METADATA,
   TELEGRAM_SCENE_STEP_METADATA,
@@ -22,6 +23,12 @@ export class MetadataAccessorService {
   isScene(target: Function): boolean {
     if (!target) return false;
     return !!this.reflector.get(TELEGRAM_SCENE_METADATA, target);
+  }
+
+  getReplyOptionsMetadata(
+    target: Function
+  ): ContextReplyOptions | false | undefined {
+    return this.reflector.get(TELEGRAM_REPLY_OPTIONS_METADATA, target);
   }
 
   getListenerMetadata(target: Function): ListenerMetadata[] | undefined {

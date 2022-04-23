@@ -52,5 +52,5 @@ export class BotUpdate {
 ```
 
 <h3 dir="rtl">
-  <a href="/docs/03_session_and_scenes.md">Next →</a>
+  <a href="/docs/03_session_and_scenes.md">→ Next</a>
 </h3>

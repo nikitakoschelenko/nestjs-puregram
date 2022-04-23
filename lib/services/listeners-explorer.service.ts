@@ -21,7 +21,11 @@ import { UpdateName } from 'puregram/lib/types';
 import { ListenerHandlerType } from '../enums/listener-handler-type.enum';
 import { TelegramContextType } from '../execution-context';
 import { TelegramParamsFactory } from '../factories/telegram-params-factory';
-import { ListenerMetadata, TelegramModuleOptions } from '../interfaces';
+import {
+  ContextReplyOptions,
+  ListenerMetadata,
+  TelegramModuleOptions
+} from '../interfaces';
 import {
   PARAM_ARGS_METADATA,
   TELEGRAM_HEAR_MANAGER,
@@ -259,10 +263,16 @@ export class ListenersExplorerService
 
         if (ctx.is(['message'])) {
           if (typeof result === 'string') {
-            if (this.telegramOptions.notReplyMessage) {
-              await (ctx as MessageContext).send(result);
-            } else {
-              await (ctx as MessageContext).reply(result);
+            const replyOptions: ContextReplyOptions | false | undefined =
+              this.metadataAccessor.getReplyOptionsMetadata(target) ??
+              this.telegramOptions.replyOptions;
+
+            if (replyOptions !== false) {
+              if (replyOptions?.send) {
+                await (ctx as MessageContext).send(result, replyOptions);
+              } else {
+                await (ctx as MessageContext).reply(result, replyOptions);
+              }
             }
           }
         }

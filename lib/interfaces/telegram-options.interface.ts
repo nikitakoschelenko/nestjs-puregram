@@ -6,6 +6,8 @@ import { Middleware } from 'middleware-io';
 import { MessageContext } from 'puregram';
 import { StartPollingOptions, TelegramOptions } from 'puregram/lib/interfaces';
 
+import { ContextReplyOptions } from './context-reply-options.interface';
+
 export interface TelegramModuleOptions {
   /**
    * Bot's token
@@ -26,6 +28,11 @@ export interface TelegramModuleOptions {
    * `startPolling` method options
    */
   pollingOptions?: StartPollingOptions | false;
+
+  /**
+   * Reply options for method returns
+   */
+  replyOptions?: ContextReplyOptions | false;
 
   /**
    * Whitelist of modules to include

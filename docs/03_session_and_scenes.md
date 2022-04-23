@@ -1,5 +1,5 @@
 # Scenes (example with session)
-At first, you need to decorate class with `@Scene(slug: string)` decorator, it's like `@Update()` decorator, but for scenes. Then you can add steps with `@AddStep(step?: number)` decorator, set `enterHandler` and `leaveHandler` with `@SceneEnter()` and `@SceneLeave()` decorators:
+At first, you need to decorate class with `@Scene(slug)` decorator, it's like `@Update()` decorator, but for scenes. Then you can add steps with `@AddStep(step?)` decorator, set `enterHandler` and `leaveHandler` with `@SceneEnter()` and `@SceneLeave()` decorators:
 ```typescript
 @Scene(SIGNUP_SCENE)
 export class SignupScene {
@@ -48,5 +48,5 @@ export class SignupScene {
 ```
 
 <h3 dir="rtl">
-  <a href="/docs/04_nestjs.md">Next →</a>
+  <a href="/docs/04_nestjs.md">→ Next</a>
 </h3>

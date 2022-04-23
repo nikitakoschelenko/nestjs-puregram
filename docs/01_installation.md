@@ -43,5 +43,5 @@ export class AppModule {}
 ```
 
 <h3 dir="rtl">
-  <a href="/docs/02_updates.md">Next →</a>
+  <a href="/docs/02_updates.md">→ Next</a>
 </h3>

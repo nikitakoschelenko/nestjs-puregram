@@ -108,5 +108,5 @@ export class BotUpdate {
 ```
 
 <h3 dir="rtl">
-  <a href="/docs/05_more.md">Next →</a>
+  <a href="/docs/05_more.md">→ Next</a>
 </h3>
