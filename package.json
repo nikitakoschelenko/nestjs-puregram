@@ -1,6 +1,6 @@
 {
   "name": "nestjs-puregram",
-  "version": "2.4.2-rc.2",
+  "version": "2.4.2-rc.3",
   "author": "Nikita Koshelenko <nikitakoschelenko@gmail.com>",
   "description": "Powerful and modern Telegram Bot API SDK for NestJS 😁",
   "keywords": [
