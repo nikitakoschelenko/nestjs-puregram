@@ -1,9 +1,9 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TelegramModule } from 'nestjs-puregram';
+import { InjectTelegram, TelegramModule } from 'nestjs-puregram';
+import { Telegram } from 'puregram';
 
-import { LoggerMiddleware } from '@/common/middlewares/logger.middleware';
-import { BotModule } from '@/bot/bot.module';
+import { EchoModule } from '@/echo/echo.module';
 
 @Module({
   imports: [
@@ -12,11 +12,18 @@ import { BotModule } from '@/bot/bot.module';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        token: configService.get('TELEGRAM_TOKEN') ?? '',
-        middlewaresBefore: [LoggerMiddleware.middleware]
+        token: configService.get('TELEGRAM_TOKEN')
       })
     }),
-    BotModule
+    EchoModule
   ]
 })
-export class AppModule {}
+export class AppModule {
+  private logger: Logger = new Logger(AppModule.name);
+
+  constructor(@InjectTelegram() private telegram: Telegram) {}
+
+  onModuleInit(): void {
+    this.logger.log(`@${this.telegram.bot.username} started polling updates`);
+  }
+}
