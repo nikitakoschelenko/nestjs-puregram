@@ -4,7 +4,7 @@ import { SceneManager } from '@puregram/scenes';
 import { SessionManager } from '@puregram/session';
 import { Middleware } from 'middleware-io';
 import { MessageContext } from 'puregram';
-import { StartPollingOptions, TelegramOptions } from 'puregram/lib/interfaces';
+import { StartPollingOptions, TelegramOptions } from 'puregram/interfaces';
 
 import { ContextReplyOptions } from './context-reply-options.interface';
 

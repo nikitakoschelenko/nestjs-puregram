@@ -1,5 +1,5 @@
-import { SendMessageParams } from 'puregram/lib/methods';
-import { Optional } from 'puregram/lib/types';
+import { SendMessageParams } from 'puregram/methods';
+import { Optional } from 'puregram/types';
 
 export interface ContextReplyOptions
   extends Optional<SendMessageParams, 'chat_id' | 'text'> {

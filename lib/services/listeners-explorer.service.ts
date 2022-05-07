@@ -16,7 +16,7 @@ import {
   Telegram,
   UpdateType
 } from 'puregram';
-import { UpdateName } from 'puregram/lib/types';
+import { UpdateName } from 'puregram/types';
 
 import { ListenerHandlerType } from '../enums/listener-handler-type.enum';
 import { TelegramContextType } from '../execution-context';
