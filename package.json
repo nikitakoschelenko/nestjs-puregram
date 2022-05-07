@@ -1,6 +1,6 @@
 {
   "name": "nestjs-puregram",
-  "version": "2.5.1",
+  "version": "2.6.1",
   "description": "Powerful and modern Telegram Bot API SDK for NestJS 😁",
   "keywords": [
     "nodejs",
@@ -33,16 +33,16 @@
     "@puregram/session": "^2.0.1-rc.1",
     "lodash": "^4.17.21",
     "middleware-io": "^2.8.0",
-    "puregram": "^2.5.1"
+    "puregram": "^2.6.1"
   },
   "devDependencies": {
     "@nestjs/common": "^8.4.4",
     "@nestjs/core": "^8.4.4",
     "@types/lodash": "^4.14.182",
-    "@types/node": "^17.0.30",
-    "@typescript-eslint/eslint-plugin": "^5.21.0",
-    "@typescript-eslint/parser": "^5.21.0",
-    "eslint": "^8.14.0",
+    "@types/node": "^17.0.31",
+    "@typescript-eslint/eslint-plugin": "^5.22.0",
+    "@typescript-eslint/parser": "^5.22.0",
+    "eslint": "^8.15.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-import-resolver-typescript": "^2.7.1",
     "eslint-plugin-import": "^2.26.0",
