@@ -1239,10 +1239,10 @@ punycode@^2.1.0:
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-2.1.1.tgz#b58b010ac40c22c5657616c8d2c2c02c7bf479ec"
   integrity sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A==
 
-puregram@^2.6.1:
-  version "2.6.1"
-  resolved "https://registry.yarnpkg.com/puregram/-/puregram-2.6.1.tgz#4046d97e14879bc9836ed6c81ffe81286ac84d78"
-  integrity sha512-UdT4Od2J5EAzUNqDpJ3rkXZ25KuBjfW4OaLSnHkL5zrSnvJnpM/KMpaS78XtIfbZmHeHZ3sXl7sK3omV7lLepg==
+puregram@^2.6.3:
+  version "2.6.3"
+  resolved "https://registry.yarnpkg.com/puregram/-/puregram-2.6.3.tgz#975168cbc82967e851f1397c214beb1a4d0726d9"
+  integrity sha512-/xTVfvIf6jfJFK1ihJ+W1FB0c1zTy2MYdPKyJGOiE9jc6/qzkQ8ZaVYMEX0olkRVXTDJBph7I+BHgxtHLJWUXw==
   dependencies:
     debug "^4.3.2"
     form-data-encoder "^1.7.2"

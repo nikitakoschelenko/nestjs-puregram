@@ -33,7 +33,7 @@
     "@puregram/session": "^2.0.1-rc.1",
     "lodash": "^4.17.21",
     "middleware-io": "^2.8.0",
-    "puregram": "^2.6.1"
+    "puregram": "^2.6.3"
   },
   "devDependencies": {
     "@nestjs/common": "^8.4.4",
@@ -58,5 +58,8 @@
     "@nestjs/core": "^8.4.4",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.5.5"
+  },
+  "engines": {
+    "node": ">=16.5.0"
   }
 }
