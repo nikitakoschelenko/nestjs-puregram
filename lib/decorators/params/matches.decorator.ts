@@ -1,5 +1,5 @@
 import { ExecutionContext, createParamDecorator } from '@nestjs/common';
-import {} from '@puregram/hear';
+import { ContextMatch } from '@puregram/hear';
 import { Context, MessageContext } from 'puregram';
 
 import { TelegramExecutionContext } from '../../execution-context';
@@ -16,8 +16,7 @@ export const Matches = createParamDecorator(
     if (!telegramContext.is(['message'])) return [];
 
     const matches: RegExpMatchArray =
-      (telegramContext as MessageContext & { $match: RegExpMatchArray | null })
-        .$match ?? [];
+      (telegramContext as MessageContext & ContextMatch).$match ?? [];
 
     return data ? matches[data] : matches;
   }

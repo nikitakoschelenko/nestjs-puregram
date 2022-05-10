@@ -1,5 +1,5 @@
 import { ExecutionContext, createParamDecorator } from '@nestjs/common';
-import {} from '@puregram/hear';
+import { ContextMatch } from '@puregram/hear';
 import { Context, MessageContext } from 'puregram';
 
 import { TelegramExecutionContext } from '../../execution-context';
@@ -16,7 +16,7 @@ export const Groups = createParamDecorator(
     if (!telegramContext.is(['message'])) return {};
 
     const matches: RegExpMatchArray | null = (
-      telegramContext as MessageContext & { $match: RegExpMatchArray | null }
+      telegramContext as MessageContext & ContextMatch
     ).$match;
     const groups: Record<string, string> = matches?.groups ?? {};
 
