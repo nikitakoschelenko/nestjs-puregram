@@ -63,11 +63,6 @@ export interface TelegramModuleOptions {
    * Use custom `HearManager` or turn it off
    */
   useHearManager?: boolean | HearManager<MessageContext>;
-
-  /**
-   * Use `send` method instead of `reply` for sending value returned from handler
-   */
-  notReplyMessage?: boolean;
 }
 
 export interface TelegramOptionsFactory {
