@@ -47,6 +47,7 @@ export class ListenersExplorerService
     new TelegramParamsFactory();
 
   private telegram!: Telegram;
+  private composer!: Composer<Context>;
 
   constructor(
     @Inject(TELEGRAM_HEAR_MANAGER)
@@ -73,56 +74,55 @@ export class ListenersExplorerService
     this.telegram = this.moduleRef.get<Telegram>(this.telegramName, {
       strict: false
     });
-
-    const composer: Composer<Context> = Composer.builder();
+    this.composer = Composer.builder();
 
     // add `before` middlewares
     this.telegramOptions.middlewaresBefore?.forEach(
-      composer.use.bind(composer)
+      this.composer.use.bind(this.composer)
     );
 
     if (this.telegramOptions.useSessionManager !== false) {
-      composer.use(this.sessionManager.middleware);
+      this.composer.use(this.sessionManager.middleware);
     }
 
     if (this.telegramOptions.useSceneManager !== false) {
-      composer.use(this.sceneManager.middleware);
-      composer.use(this.sceneManager.middlewareIntercept);
+      this.composer.use(this.sceneManager.middleware);
+      this.composer.use(this.sceneManager.middlewareIntercept);
     }
 
-    this.explore(composer);
+    // explore methods and scenes
+    this.explore();
 
     if (this.telegramOptions.useHearManager !== false) {
-      composer.use(this.hearManager.middleware);
+      this.composer.use(this.hearManager.middleware);
     }
 
     // add `after` middlewares
-    this.telegramOptions.middlewaresAfter?.forEach(composer.use.bind(composer));
+    this.telegramOptions.middlewaresAfter?.forEach(
+      this.composer.use.bind(this.composer)
+    );
 
     // finally
-    this.telegram.updates.use(composer.compose());
+    this.telegram.updates.use(this.composer.compose());
   }
 
-  explore(composer: Composer<Context>): void {
+  explore(): void {
     const modules: Module[] = this.getModules(
       this.modulesContainer,
       this.telegramOptions.include ?? []
     );
 
-    this.registerUpdates(composer, modules);
+    this.registerUpdates(modules);
     this.registerScenes(modules);
   }
 
-  private registerUpdates(
-    composer: Composer<Context>,
-    modules: Module[]
-  ): void {
+  private registerUpdates(modules: Module[]): void {
     const updates: InstanceWrapper[] = this.flatMap(
       modules,
       (instance) => this.filterUpdates(instance)!
     );
 
-    updates.forEach((wrapper) => this.registerListeners(composer, wrapper));
+    updates.forEach((wrapper) => this.registerListeners(wrapper));
   }
 
   private filterUpdates(
@@ -158,15 +158,12 @@ export class ListenersExplorerService
     return wrapper;
   }
 
-  private registerListeners(
-    composer: Composer<Context>,
-    wrapper: InstanceWrapper<Object>
-  ): void {
+  private registerListeners(wrapper: InstanceWrapper<Object>): void {
     const { instance } = wrapper;
     const prototype: Object = Object.getPrototypeOf(instance);
 
     this.metadataScanner.scanFromPrototype(instance, prototype, (name) =>
-      this.registerIfListener(composer, instance, prototype, name)
+      this.registerIfListener(instance, prototype, name)
     );
   }
 
@@ -235,7 +232,6 @@ export class ListenersExplorerService
   }
 
   private registerIfListener(
-    composer: Composer<Context>,
     instance: Object,
     prototype: Object,
     method: string
@@ -282,7 +278,7 @@ export class ListenersExplorerService
 
       switch (type) {
         case ListenerHandlerType.USE:
-          composer.use(handler);
+          this.composer.use(handler);
           break;
 
         case ListenerHandlerType.ON:
@@ -294,7 +290,7 @@ export class ListenersExplorerService
           const middlewares: Middleware<Context>[] =
             (args[1] as Middleware<Context>[]) ?? [];
 
-          composer.use((context: Context, next: NextMiddleware) => {
+          this.composer.use((context: Context, next: NextMiddleware) => {
             if (context.is([update])) {
               const handlerComposer: Composer<Context> = new Composer();
               [
