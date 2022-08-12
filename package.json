@@ -39,12 +39,12 @@
     "@nestjs/common": "^9.0.5",
     "@nestjs/core": "^9.0.5",
     "@types/lodash": "^4.14.182",
-    "@types/node": "^18.6.1",
-    "@typescript-eslint/eslint-plugin": "^5.31.0",
-    "@typescript-eslint/parser": "^5.31.0",
-    "eslint": "^8.20.0",
+    "@types/node": "^18.7.2",
+    "@typescript-eslint/eslint-plugin": "^5.33.0",
+    "@typescript-eslint/parser": "^5.33.0",
+    "eslint": "^8.21.0",
     "eslint-config-prettier": "^8.5.0",
-    "eslint-import-resolver-typescript": "^3.3.0",
+    "eslint-import-resolver-typescript": "^3.4.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-prettier": "^4.2.1",
     "prettier": "^2.7.1",
@@ -54,8 +54,8 @@
     "typescript": "^4.7.4"
   },
   "peerDependencies": {
-    "@nestjs/common": "^9.0.5",
-    "@nestjs/core": "^9.0.5",
+    "@nestjs/common": ">=7",
+    "@nestjs/core": ">=7",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.5.5"
   },
