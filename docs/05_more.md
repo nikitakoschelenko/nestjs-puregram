@@ -1,20 +1,32 @@
 # Injection
 When you need access to a Telegram instance, you can inject it:
 ```typescript
-constructor(
-  @InjectTelegram() private telegram: Telegram
-) {}
+import { Injectable } from '@nestjs/common';
+import { InjectTelegram } from 'nestjs-puregram';
+import { Telegram } from 'puregram';
+
+@Injectable()
+export class BotService {
+  constructor(
+    @InjectTelegram() private telegram: Telegram
+  ) {}
+
+  // do what the fck you want
+}
 ```
 
 # Middlewares
 You can use middlewares for `puregram` before and after others (built-in):
 ```typescript
+import { Module } from '@nestjs/common';
+import { TelegramModule } from 'nestjs-puregram';
+
 @Module({
   imports: [
     TelegramModule.forRoot({
       token: 'mytoken',
-      middlewaresBefore: [beforeMiddleware],
-      middlewaresAfter: [afterMiddleware]
+      middlewaresBefore: [/* middlewares before internal */],
+      middlewaresAfter: [/* middlewares after internal */]
     })
   ],
   // ...
@@ -25,6 +37,9 @@ export class AppModule {}
 # Multiple bots
 In some cases, you may need to run multiple bots at the same time. To do this, just pass a name for each instance in the `TelegramModule` options:
 ```typescript
+import { Module } from '@nestjs/common';
+import { TelegramModule } from 'nestjs-puregram';
+
 @Module({
   imports: [
     TelegramModule.forRoot({
@@ -44,6 +59,9 @@ export class AppModule {}
 # Param decorators
 The `@Ctx()` or `@Context()` parameter decorators allow you to access the context:
 ```typescript
+import { Update, HearFallback, Ctx } from 'nestjs-puregram';
+import { Context } from 'puregram';
+
 @Update()
 export class BotUpdate {
   @HearFallback()
@@ -55,13 +73,17 @@ export class BotUpdate {
 
 The `@Next()` parameter decorator allows you to access the `next` function in middleware:
 ```typescript
+import { Update, Use, Ctx, Next } from 'nestjs-puregram';
+import { TelegramContext } from 'puregram';
+import { NextMiddleware, NextMiddlewareReturn } from 'middleware-io';
+
 @Update()
 export class BotUpdate {
   @Use()
   middleware(
     @Ctx() ctx: TelegramContext,
     @Next() next: NextMiddleware
-  ): Promise<unknown> {
+  ): NextMiddlewareReturn {
     this.logger.debug(`New update received: ${ctx.updateId}`);
 
     return next();
@@ -71,6 +93,9 @@ export class BotUpdate {
 
 The `@Matches()` and `@Groups()` parameter decorators allow you to access the `context.$match` and `context.$match.groups`:
 ```typescript
+import { ParseIntPipe, ParseBoolPipe } from '@nestjs/common';
+import { Update, Hears, Matches, Groups } from 'nestjs-puregram';
+
 @Update()
 export class BotUpdate {
   @Hears(/^\/test (?<first>\d+) (?<second>true|false)$/i)
@@ -89,6 +114,9 @@ and pipes will work correctly!
 # Reply options
 You can pass reply options for method returns to `TelegramModule` options:
 ```typescript
+import { Module } from '@nestjs/common';
+import { TelegramModule } from 'nestjs-puregram';
+
 @Module({
   imports: [
     TelegramModule.forRoot({
@@ -105,6 +133,8 @@ export class AppModule {}
 ```
 or decorate class or method with `@ReplyOptions(replyOptions)` decorator:
 ```typescript
+import { Update, Hears, ReplyOptions } from 'nestjs-puregram';
+
 @Update()
 export class BotUpdate {
   @Hears(/^\/ping$/i)

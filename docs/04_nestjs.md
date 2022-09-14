@@ -3,6 +3,10 @@ This module supports Exception Filters, Pipes, Guards and Interceptors.
 
 ## Exception filter example
 ```typescript
+import { Catch, ExceptionFilter, ArgumentsHost } from '@nestjs/common';
+import { TelegramException, TelegramArgumentsHost } from 'nestjs-puregram';
+import { Context, MessageContext } from 'puregram';
+
 @Catch(TelegramException)
 export class TelegramExceptionFilter implements ExceptionFilter {
   catch(exception: TelegramException, host: ArgumentsHost) {
@@ -17,6 +21,12 @@ export class TelegramExceptionFilter implements ExceptionFilter {
 
 ## Pipe example
 ```typescript
+import { ParseIntPipe } from '@nestjs/common';
+import { Update, Hears, Ctx, Groups } from 'nestjs-puregram';
+import { MessageContext } from 'puregram';
+
+import { ReverseStringPipe } from './reverse-string.pipe';
+
 @Update()
 export class BotUpdate {
   @Hears(/^\/int (?<int>\d+)$/i)
@@ -37,6 +47,8 @@ export class BotUpdate {
 ```
 
 ```typescript
+import { Injectable, PipeTransform } from '@nestjs/common';
+
 @Injectable()
 export class ReverseStringPipe implements PipeTransform {
   transform(value: string): string {
@@ -47,6 +59,10 @@ export class ReverseStringPipe implements PipeTransform {
 
 ## Guard example
 ```typescript
+import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+import { TelegramExecutionContext, TelegramException } from 'nestjs-puregram';
+import { Context } from 'puregram';
+
 @Injectable()
 export class AdminGuard implements CanActivate {
   // IMPORTANT: canActivate function MUST be async
@@ -63,6 +79,12 @@ export class AdminGuard implements CanActivate {
 ```
 
 ```typescript
+import { UseFilters, UseGuards } from '@nestjs/common';
+import { Update, Hears } from 'nestjs-puregram';
+
+import { TelegramExceptionFilter } from './telegram-exception.filter'
+import { AdminGuard } from './admin.guard'
+
 @Update()
 @UseFilters(TelegramExceptionFilter)
 export class BotUpdate {
@@ -76,6 +98,9 @@ export class BotUpdate {
 
 ## Interceptor example
 ```typescript
+import { Injectable, NestInterceptor, Logger, ExecutionContext, CallHandler } from '@nestjs/common';
+import { Observable } from 'rxjs';
+
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
   private logger: Logger = new Logger(LoggingInterceptor.name);
@@ -92,6 +117,11 @@ export class LoggingInterceptor implements NestInterceptor {
 ```
 
 ```typescript
+import { UseInterceptors } from '@nestjs/common';
+import { Update, Use, Ctx, Next } from 'nestjs-puregram';
+import { TelegramContext } from 'puregram';
+import { NextMiddleware, NextMiddlewareReturn } from 'middleware-io';
+
 @Update()
 export class BotUpdate {
   @Use()
@@ -99,7 +129,7 @@ export class BotUpdate {
   middleware(
     @Ctx() ctx: TelegramContext,
     @Next() next: NextMiddleware
-  ): Promise<unknown> {
+  ): NextMiddlewareReturn {
     this.logger.debug(`New update received: ${ctx.updateId}`);
 
     return next();

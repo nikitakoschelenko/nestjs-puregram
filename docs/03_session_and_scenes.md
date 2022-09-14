@@ -1,6 +1,11 @@
 # Scenes (example with session)
 At first, you need to decorate class with `@Scene(slug)` decorator, it's like `@Update()` decorator, but for scenes. Then you can add steps with `@AddStep(step?)` decorator, set `enterHandler` and `leaveHandler` with `@SceneEnter()` and `@SceneLeave()` decorators:
 ```typescript
+import { Scene, SceneEnter, Ctx, SceneLeave, AddStep } from 'nestjs-puregram';
+import { Context, MessageContext } from 'puregram';
+import { SessionInterface } from '@puregram/session';
+import { StepContext } from '@puregram/scenes';
+
 @Scene(SIGNUP_SCENE)
 export class SignupScene {
   @SceneEnter()

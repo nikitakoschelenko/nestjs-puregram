@@ -27,6 +27,10 @@ telegram.api.setWebhook({
 ## Getting updates
 First of all, you need to decorate class with `@Update()` decorator, it's like NestJS's `@Controller()` decorator, but for Telegram Bot API updates. Then you can use listener decorators like `@Hears(^/\/ping/$)`, `@HearFallback()`, `@On('message')` and `@Use()`:
 ```typescript
+import { Update, On, Ctx, Next, Hears, HearFallback } from 'nestjs-puregram';
+import { MessageContext } from 'puregram';
+import { NextMiddleware, NextMiddlewareReturn } from 'middleware-io';
+
 @Update()
 export class BotUpdate {
   @On('message')
