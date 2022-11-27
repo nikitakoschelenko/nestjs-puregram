@@ -16,17 +16,31 @@ export class BotService {
 ```
 
 # Middlewares
-You can use middlewares for `puregram` before and after others (built-in):
+You can use middlewares for `puregram` and customize its order:
 ```typescript
 import { Module } from '@nestjs/common';
-import { TelegramModule } from 'nestjs-puregram';
+import { TelegramModule, TelegramInternalMiddleware } from 'nestjs-puregram';
 
 @Module({
   imports: [
     TelegramModule.forRoot({
       token: 'mytoken',
-      middlewaresBefore: [/* middlewares before internal */],
-      middlewaresAfter: [/* middlewares after internal */]
+      middlewares: [
+        // use sessionManager.middleware
+        TelegramInternalMiddleware.SessionManager,
+        // use own middleware
+        (context: SessionInterface, next) => {
+          // log current session
+          console.log(context.session)
+          return next()
+        },
+        // use sceneManager.middleware and sceneManager.middlewareIntercept
+        TelegramInternalMiddleware.SceneManager,
+        // use hearManager.middleware (methods that are decorated with the `@Hears(...)` decorator will be called)
+        TelegramInternalMiddleware.HearManager,
+        // use your middlewares (methods that are decorated with the `@On(...)` and `@Use()` decorators will be called)
+        TelegramInternalMiddleware.Handlers
+      ]
     })
   ],
   // ...

@@ -6,6 +6,8 @@ import { Middleware } from 'middleware-io';
 import { MessageContext } from 'puregram';
 import { StartPollingOptions, TelegramOptions } from 'puregram/interfaces';
 
+import { TelegramInternalMiddleware } from '../enums/telegram-internal-middleware.enum';
+
 import { ContextReplyOptions } from './context-reply-options.interface';
 
 export interface TelegramModuleOptions {
@@ -40,12 +42,19 @@ export interface TelegramModuleOptions {
   include?: Function[];
 
   /**
+   * Order global and internal middlewares
+   */
+  middlewares?: ReadonlyArray<Middleware<any> | TelegramInternalMiddleware>;
+
+  /**
    * Use global middlewares before others
+   * @deprecated Use the `middlewares` option to order global and internal middlewares
    */
   middlewaresBefore?: ReadonlyArray<Middleware<any>>;
 
   /**
    * Use global middlewares after others
+   * @deprecated Use the `middlewares` option to order global and internal middlewares
    */
   middlewaresAfter?: ReadonlyArray<Middleware<any>>;
 

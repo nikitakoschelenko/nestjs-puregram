@@ -18,7 +18,7 @@ import {
 } from 'puregram';
 import { UpdateName } from 'puregram/types';
 
-import { ListenerHandlerType } from '../enums/listener-handler-type.enum';
+import { ListenerHandlerType, TelegramInternalMiddleware } from '../enums';
 import { TelegramContextType } from '../execution-context';
 import { TelegramParamsFactory } from '../factories/telegram-params-factory';
 import {
@@ -76,31 +76,74 @@ export class ListenersExplorerService
     });
     this.composer = Composer.builder();
 
-    // add `before` middlewares
-    this.telegramOptions.middlewaresBefore?.forEach(
-      this.composer.use.bind(this.composer)
-    );
+    if (this.telegramOptions.middlewares) {
+      for (const middleware of this.telegramOptions.middlewares) {
+        if (typeof middleware === 'function') {
+          this.composer.use(middleware);
+        }
 
-    if (this.telegramOptions.useSessionManager !== false) {
-      this.composer.use(this.sessionManager.middleware);
+        if (typeof middleware === 'number') {
+          switch (middleware) {
+            case TelegramInternalMiddleware.SessionManager: {
+              if (this.telegramOptions.useSessionManager !== false) {
+                this.composer.use(this.sessionManager.middleware);
+              }
+
+              break;
+            }
+
+            case TelegramInternalMiddleware.SceneManager: {
+              if (this.telegramOptions.useSceneManager !== false) {
+                this.composer.use(this.sceneManager.middleware);
+                this.composer.use(this.sceneManager.middlewareIntercept);
+              }
+
+              break;
+            }
+
+            case TelegramInternalMiddleware.HearManager: {
+              if (this.telegramOptions.useHearManager !== false) {
+                this.composer.use(this.hearManager.middleware);
+              }
+
+              break;
+            }
+
+            case TelegramInternalMiddleware.Handlers: {
+              this.explore();
+
+              break;
+            }
+          }
+        }
+      }
+    } else {
+      // deprecated: add `before` middlewares
+      this.telegramOptions.middlewaresBefore?.forEach(
+        this.composer.use.bind(this.composer)
+      );
+
+      if (this.telegramOptions.useSessionManager !== false) {
+        this.composer.use(this.sessionManager.middleware);
+      }
+
+      if (this.telegramOptions.useSceneManager !== false) {
+        this.composer.use(this.sceneManager.middleware);
+        this.composer.use(this.sceneManager.middlewareIntercept);
+      }
+
+      // explore methods and scenes
+      this.explore();
+
+      if (this.telegramOptions.useHearManager !== false) {
+        this.composer.use(this.hearManager.middleware);
+      }
+
+      // deprecated: add `after` middlewares
+      this.telegramOptions.middlewaresAfter?.forEach(
+        this.composer.use.bind(this.composer)
+      );
     }
-
-    if (this.telegramOptions.useSceneManager !== false) {
-      this.composer.use(this.sceneManager.middleware);
-      this.composer.use(this.sceneManager.middlewareIntercept);
-    }
-
-    // explore methods and scenes
-    this.explore();
-
-    if (this.telegramOptions.useHearManager !== false) {
-      this.composer.use(this.hearManager.middleware);
-    }
-
-    // add `after` middlewares
-    this.telegramOptions.middlewaresAfter?.forEach(
-      this.composer.use.bind(this.composer)
-    );
 
     // finally
     this.telegram.updates.use(this.composer.compose());
