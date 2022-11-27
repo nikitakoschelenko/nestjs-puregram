@@ -277,11 +277,11 @@ export class ListenersExplorerService
       };
 
       switch (type) {
-        case ListenerHandlerType.USE:
+        case ListenerHandlerType.Use:
           this.composer.use(handler);
           break;
 
-        case ListenerHandlerType.ON:
+        case ListenerHandlerType.On:
           const update: UpdateType | UpdateName | undefined = args[0] as
             | UpdateType
             | UpdateName;
@@ -308,7 +308,7 @@ export class ListenersExplorerService
           });
           break;
 
-        case ListenerHandlerType.HEARS:
+        case ListenerHandlerType.Hears:
           const hearConditions: HearConditions<unknown> | undefined =
             args[0] as HearConditions<unknown>;
           if (!hearConditions) break;
@@ -316,7 +316,7 @@ export class ListenersExplorerService
           this.hearManager.hear(hearConditions, handler);
           break;
 
-        case ListenerHandlerType.HEAR_FALLBACK:
+        case ListenerHandlerType.HearFallback:
           this.hearManager.onFallback(handler);
           break;
       }

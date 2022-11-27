@@ -1,4 +1,4 @@
 export enum TelegramParamtype {
-  CONTEXT,
-  NEXT
+  Context,
+  Next
 }

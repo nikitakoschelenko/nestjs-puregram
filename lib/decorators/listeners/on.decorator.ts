@@ -8,4 +8,4 @@ import { createListenerDecorator } from '../../utils';
 export const On = <T = {}>(
   update: UpdateType | UpdateName,
   middlewares?: MaybeArray<Middleware<Context & T>>
-) => createListenerDecorator(ListenerHandlerType.ON, update, middlewares);
+) => createListenerDecorator(ListenerHandlerType.On, update, middlewares);

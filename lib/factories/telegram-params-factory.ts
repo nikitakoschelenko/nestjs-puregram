@@ -14,9 +14,9 @@ export class TelegramParamsFactory implements ParamsFactory {
     const [ctx, next] = args as [Context, NextMiddleware];
 
     switch (type) {
-      case TelegramParamtype.NEXT:
+      case TelegramParamtype.Next:
         return next;
-      case TelegramParamtype.CONTEXT:
+      case TelegramParamtype.Context:
         return data && ctx ? ctx[data as keyof Context] : ctx;
       default:
         return null;
