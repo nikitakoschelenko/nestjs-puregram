@@ -52,6 +52,22 @@ export class SignupScene {
 }
 ```
 
+Then you need to add your scene to the module providers:
+```typescript
+import { Module } from '@nestjs/common';
+import { TelegramModule } from 'nestjs-puregram';
+
+@Module({
+  imports: [
+    TelegramModule.forRoot({
+      token: 'mytoken'
+    })
+  ],
+  providers: [SignupScene]
+})
+export class AppModule {}
+```
+
 <h3 dir="rtl">
   <a href="/docs/04_nestjs.md">→ Next</a>
 </h3>
