@@ -1,12 +1,12 @@
 <p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" /></a>
+  <a href="https://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" /></a>
 </p>
 <p align="center">
-  A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.
+  A progressive <a href="https://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.
 </p>
 
 <p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://camo.githubusercontent.com/ae383d0564deaf25b8dba9046f38450cb1568317bb4d536cd9535b5911b0a7b6/68747470733a2f2f692e696d6775722e636f6d2f5a7a6a6d4538692e706e67" width="320" alt="Nest Logo" /></a>
+  <a href="https://github.com/nitreojs/puregram" target="blank"><img src="https://camo.githubusercontent.com/ae383d0564deaf25b8dba9046f38450cb1568317bb4d536cd9535b5911b0a7b6/68747470733a2f2f692e696d6775722e636f6d2f5a7a6a6d4538692e706e67" width="320" alt="Nest Logo" /></a>
 </p>
 <p align='center'>
   Powerful and epic overall,
