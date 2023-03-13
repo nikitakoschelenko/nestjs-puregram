@@ -15,32 +15,54 @@ export class BotService {
 }
 ```
 
-# Middlewares
+# Composer
 You can use middlewares for `puregram` and customize its order:
 ```typescript
 import { Module } from '@nestjs/common';
-import { TelegramModule, TelegramInternalMiddleware } from 'nestjs-puregram';
+import { TelegramModule } from 'nestjs-puregram';
+import { Composer, MessageContext } from 'puregram';
+import { SessionManager } from '@puregram/session';
+import { SceneManager, StepContext } from '@puregram/scenes';
+import { HearManager } from '@puregram/hear';
 
 @Module({
   imports: [
-    TelegramModule.forRoot({
-      token: 'mytoken',
-      middlewares: [
-        // use sessionManager.middleware
-        TelegramInternalMiddleware.SessionManager,
-        // use own middleware
-        (context: SessionInterface, next) => {
-          // log current session
-          console.log(context.session)
-          return next()
-        },
-        // use sceneManager.middleware and sceneManager.middlewareIntercept
-        TelegramInternalMiddleware.SceneManager,
-        // use hearManager.middleware (methods that are decorated with the `@Hears(...)` decorator will be called)
-        TelegramInternalMiddleware.HearManager,
-        // use your middlewares (methods that are decorated with the `@On(...)` and `@Use()` decorators will be called)
-        TelegramInternalMiddleware.Handlers
-      ]
+    TelegramModule.forRootAsync({
+      useFactory: () => {
+        const sessionManager = new SessionManager();
+        const sceneManager = new SceneManager();
+        const hearManager = new HearManager<MessageContext>();
+
+        return {
+          token: 'mytoken',
+          useSessionManager: sessionManager,
+          useSceneManager: sceneManager,
+          useHearManager: hearManager,
+          useComposer: (composer) => {
+            // create new composer
+            const recomposer = Composer.builder();
+
+            // use sessionManager.middleware
+            recomposer.use(sessionManager.middleware);
+            // use sceneManager.middleware
+            recomposer.use(sceneManager.middleware);
+            // use hearManager.middleware (methods that are decorated with the `@Hears(...)` decorator will be called if you provide hearManager to `useHearManager` option)
+            recomposer.use(hearManager.middleware);
+            // use own middleware
+            recomposer.use((context: Context & StepContext, next) => {
+              console.log({ context });
+              return next();
+            })
+            // use sceneManager.middlewareIntercept
+            recomposer.use(sceneManager.middlewareIntercept);
+            // use other middlewares (methods that are decorated with the `@On(...)`, `@Use(...)` and others)
+            recomposer.use(composer.compose());
+
+            // return our new composer
+            return recomposer;
+          }
+        }
+      }
     })
   ],
   // ...

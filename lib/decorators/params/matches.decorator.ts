@@ -8,7 +8,7 @@ export const Matches = createParamDecorator(
   (
     data: number,
     context: ExecutionContext
-  ): RegExpMatchArray | string | undefined => {
+  ): never[] | RegExpMatchArray | string | undefined => {
     const executionContext: TelegramExecutionContext =
       TelegramExecutionContext.create(context);
 

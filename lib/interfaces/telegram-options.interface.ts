@@ -3,10 +3,8 @@ import { HearManager } from '@puregram/hear';
 import { SceneManager } from '@puregram/scenes';
 import { SessionManager } from '@puregram/session';
 import { Middleware } from 'middleware-io';
-import { MessageContext } from 'puregram';
+import { Composer, Context, MessageContext } from 'puregram';
 import { StartPollingOptions, TelegramOptions } from 'puregram/interfaces';
-
-import { TelegramInternalMiddleware } from '../enums/telegram-internal-middleware.enum';
 
 import { ContextReplyOptions } from './context-reply-options.interface';
 
@@ -42,19 +40,12 @@ export interface TelegramModuleOptions {
   include?: Function[];
 
   /**
-   * Order global and internal middlewares
-   */
-  middlewares?: ReadonlyArray<Middleware<any> | TelegramInternalMiddleware>;
-
-  /**
    * Use global middlewares before others
-   * @deprecated Use the `middlewares` option to order global and internal middlewares
    */
   middlewaresBefore?: ReadonlyArray<Middleware<any>>;
 
   /**
    * Use global middlewares after others
-   * @deprecated Use the `middlewares` option to order global and internal middlewares
    */
   middlewaresAfter?: ReadonlyArray<Middleware<any>>;
 
@@ -72,6 +63,11 @@ export interface TelegramModuleOptions {
    * Use custom `HearManager` or turn it off
    */
   useHearManager?: boolean | HearManager<MessageContext>;
+
+  /**
+   * Use custom composer
+   */
+  useComposer?: (composer: Composer<Context>) => Composer<Context>;
 }
 
 export interface TelegramOptionsFactory {

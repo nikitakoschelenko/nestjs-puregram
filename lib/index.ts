@@ -8,5 +8,4 @@ export {
   TelegramModuleOptions,
   TelegramOptionsFactory
 } from './interfaces';
-export { TelegramInternalMiddleware } from './enums';
 export { getTelegramToken } from './utils';
