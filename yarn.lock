@@ -1413,17 +1413,17 @@ punycode@^2.1.0:
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-2.1.1.tgz#b58b010ac40c22c5657616c8d2c2c02c7bf479ec"
   integrity sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A==
 
-puregram@^2.9.8:
-  version "2.10.0"
-  resolved "https://registry.yarnpkg.com/puregram/-/puregram-2.10.0.tgz#87071ab5028263f339fec902132eb28202fe5f95"
-  integrity sha512-yLEBxms75M4kTK3ho2ycq3WVHKWvOpGeSfwL2lg5RJEtQ/mNXmZQVrpZyoUTWQoh03ULGbYGDyycCQXauXEVZA==
+puregram@^2.10.2:
+  version "2.10.2"
+  resolved "https://registry.yarnpkg.com/puregram/-/puregram-2.10.2.tgz#dfe6b5664e79098aa931253a0ba0be60f01211f3"
+  integrity sha512-BafRLf6VOAG4LdLAz5se1gQmKqSUYd0apCleMVbxVVT5WlEHU9UPNGZsHzCRE8J+CQqfNQ6s27N0WdWfSSml0Q==
   dependencies:
     debug "^4.3.2"
     form-data-encoder "^1.7.2"
     formdata-node "^4.3.2"
     inspectable "^1.2.0"
     middleware-io "^2.8.0"
-    undici "~5.11.0"
+    undici "5.19.1"
 
 queue-microtask@^1.2.2:
   version "1.2.3"
@@ -1677,10 +1677,10 @@ unbox-primitive@^1.0.1:
     has-symbols "^1.0.2"
     which-boxed-primitive "^1.0.2"
 
-undici@~5.11.0:
-  version "5.11.0"
-  resolved "https://registry.yarnpkg.com/undici/-/undici-5.11.0.tgz#1db25f285821828fc09d3804b9e2e934ae86fc13"
-  integrity sha512-oWjWJHzFet0Ow4YZBkyiJwiK5vWqEYoH7BINzJAJOLedZ++JpAlCbUktW2GQ2DS2FpKmxD/JMtWUUWl1BtghGw==
+undici@5.19.1:
+  version "5.19.1"
+  resolved "https://registry.yarnpkg.com/undici/-/undici-5.19.1.tgz#92b1fd3ab2c089b5a6bd3e579dcda8f1934ebf6d"
+  integrity sha512-YiZ61LPIgY73E7syxCDxxa3LV2yl3sN8spnIuTct60boiiRaE1J8mNWHO8Im2Zi/sFrPusjLlmRPrsyraSqX6A==
   dependencies:
     busboy "^1.6.0"
 

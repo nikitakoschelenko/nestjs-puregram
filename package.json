@@ -33,7 +33,7 @@
     "@puregram/session": "^2.0.1-rc.1",
     "lodash": "^4.17.21",
     "middleware-io": "^2.8.1",
-    "puregram": "^2.9.8"
+    "puregram": "^2.10.2"
   },
   "devDependencies": {
     "@nestjs/common": "^9.2.0",
